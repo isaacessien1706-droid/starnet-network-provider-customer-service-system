@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Starnet Telecom e-QMS | Customer Care Queue System</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOP BRAND HEADER -->
+  <header>
+    <div class="brand-area">
+      <div class="starnet-logo">★ STARNET</div>
+      <div class="brand-title">
+        <h1>Starnet Telecommunications — Customer Care Center (e-QMS)</h1>
+        <p>Dynamic Linked-List FIFO Queue Management System</p>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-pill">
+        <span>Waiting (Size)</span>
+        <strong id="statWaiting">0</strong>
+      </div>
+      <div class="stat-pill">
+        <span>Est. Max Wait</span>
+        <strong id="statWaitTime">0 mins</strong>
+      </div>
+      <div class="stat-pill">
+        <span>Served Today</span>
+        <strong id="statServed">0</strong>
+      </div>
+      <div class="stat-pill">
+        <span>Time Complexity</span>
+        <strong>O(1)</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APPLICATION GRID -->
+  <div class="container">
+
+    <!-- LEFT PANEL: SELF-SERVICE TOUCHSCREEN KIOSK (ENQUEUE) -->
+    <div class="card">
+      <div class="card-header">
+        <h2>1. Starnet Self-Service Kiosk</h2>
+        <span class="badge-tag">enqueue(Tail)</span>
+      </div>
+
+      <form id="kioskForm" onsubmit="handleIssueTicket(event)">
+        <div class="form-group">
+          <label for="subName">Subscriber Full Name</label>
+          <input type="text" id="subName" placeholder="e.g., Kwame Mensah" required />
+        </div>
+
+        <div class="form-group">
+          <label for="subPhone">Starnet Phone Number (MSISDN)</label>
+          <input type="text" id="subPhone" placeholder="e.g., 027 412 3456" required />
+        </div>
+
+        <div class="form-group">
+          <label for="subService">Select Telecom Service Category</label>
+          <select id="subService">
+            <option value="1">StarPay Mobile Money Reversal & PIN Reset (Counter #1)</option>
+            <option value="2">SIM Swap, eSIM & Ghana Card Linking (Counter #2)</option>
+            <option value="3">StarFibre 5G & Router Broadband (Counter #3)</option>
+            <option value="4">General Enquiry & Postpaid Billing (Counter #4)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-starnet">
+          + Issue Kiosk Ticket (Enqueue at Tail)
+        </button>
+      </form>
+
+      <button type="button" class="btn btn-demo" onclick="loadSampleRushHour()">
+        ⚡ Quick Demo: Auto-Load 3 Starnet Subscribers
+      </button>
+
+      <!-- THERMAL RECEIPT OUTPUT -->
+      <div id="receiptBox" class="receipt-box">
+        <h4>STARNET TELECOM KIOSK RECEIPT</h4>
+        <div id="receiptTicketNo" class="receipt-ticket-no">PAY-101</div>
+        <div class="receipt-row"><span>Subscriber:</span><strong id="recName">-</strong></div>
+        <div class="receipt-row"><span>Starnet No:</span><strong id="recPhone">-</strong></div>
+        <div class="receipt-row"><span>Service:</span><strong id="recService">-</strong></div>
+        <div class="receipt-row"><span>Counter:</span><strong id="recCounter">-</strong></div>
+        <div class="receipt-row"><span>Queue Position:</span><strong id="recPos">-</strong></div>
+        <div class="receipt-row"><span>Est. Wait Time:</span><strong id="recWait">-</strong></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: AGENT CONTROLS, LINKED-LIST MEMORY & LOUNGE DISPLAY -->
+    <div class="right-column">
+
+      <!-- AGENT TERMINAL & AUDIO CALL SCREEN (DEQUEUE & PEEK) -->
+      <div class="card">
+        <div class="card-header">
+          <h2>2. Service Counter Agent Terminal</h2>
+          <span class="badge-tag">dequeue(Head) / peek()</span>
+        </div>
+
+        <div class="counter-grid">
+          <div class="agent-controls">
+            <button class="btn btn-serve" onclick="handleDequeue()">
+              🔊 Call Next Subscriber (Dequeue Head)
+            </button>
+            <button class="btn btn-peek" onclick="handlePeek()">
+              👁️ Peek Next Subscriber at Head
+            </button>
+            <div id="statusToast" class="toast-alert"></div>
+          </div>
+
+          <div id="servingScreen" class="now-serving-screen">
+            <div class="serving-label">NOW SERVING AT STARNET COUNTER</div>
+            <div id="servingTicket" class="serving-ticket">STANDBY</div>
+            <div id="servingDetails" class="serving-details">All counters are currently idle</div>
+            <div id="servingCounterBadge" class="serving-counter-badge">Waiting for Dequeue</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DYNAMIC LINKED-LIST POINTER VISUALIZER -->
+      <div class="card">
+        <div class="card-header">
+          <h2>3. Live Linked-List Queue Memory Structure</h2>
+          <span class="badge-tag">Head -> StarnetNode* -> Tail -> NULL</span>
+        </div>
+        <div id="dsVisualizer" class="ds-visualizer"></div>
+      </div>
+
+      <!-- OVERHEAD LOUNGE TV QUEUE DISPLAY -->
+      <div class="card">
+        <div class="card-header">
+          <h2>4. Starnet Lounge Overhead TV Display</h2>
+          <span class="badge-tag">FIFO Traversal O(n)</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Ticket #</th>
+                <th>Subscriber Name</th>
+                <th>Starnet No.</th>
+                <th>Target Counter</th>
+                <th>Service Category</th>
+                <th>Est. Wait</th>
+              </tr>
+            </thead>
+            <tbody id="queueTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
